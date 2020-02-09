@@ -6,5 +6,78 @@ I.e. writing a dynamic table component is a matter of some lines:
 
 [source,js]
 ----
-include::https://github.com/ArneLimburg/simple-el/blob/0cdfa465c23ae752be1c41494a5612e7581e8994/examples/table.component.js#L1-L27[]
+class TableComponent extends HTMLTableElement {
+
+  connectedCallback() {
+    this._rowTemplate = this.querySelector('tbody').innerHTML;
+    const component = this;
+    this.expression = parse(this.getAttribute('value'));
+    this.expression.observeValue(this, () => { component.render() });
+    this.render();  
+  }
+  
+  render() {
+    const value = this.expression.getValue(this);
+    let innerHTML = '';
+    const component = this;
+    const context = { parentNode: component };
+    const key = this.getAttribute('var');
+    value.forEach(function(item) {
+      context[key] = item;
+      innerHTML += replaceValues(context, component._rowTemplate);
+    });
+    this.querySelector('tbody').innerHTML = innerHTML;
+  }
+}
+
+customElements.define('repeat-table', TableComponent, { extends: "table" });
 ---- 
+
+Such component can be used like this:
+
+[source,js]
+----
+class CustomerListComponent extends HTMLElement {
+
+  connectedCallback() {
+    this.customers = [
+      {
+        number: 1000,
+        name: "Jane Doe"
+      },
+      {
+        number: 1001,
+        name: "John Doe"
+      },
+    ];
+    this.innerHTML = `
+      <table is="repeat-table" var="customer" value="#{customers}">
+        <thead>
+          <tr>
+            <td>Customer Number</td>
+            <td>Customer Name</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#{customer.number}</td>
+            <td>#{customer.name}</td>
+          </tr>
+        </tbody>
+      </table>`;
+  }
+}
+
+customElements.define('customer-list', CustomerListComponent);
+----
+That would be rendered as 
+|===
+|Customer Number |Customer Name 
+
+|1000
+|Jane Doe
+
+|1001
+|John Doe
+|===
+and thanks to the call to `observeValue` every change of the property `customers` would be reflected in the table.
