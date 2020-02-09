@@ -1,13 +1,16 @@
 export function parse(expression) {
-    console.log('parsing ' + expression);
+    /* develblock:start */
     if (typeof expression != 'string' && !(expression instanceof String)) {
         throw Error('argument must be of type string');
     }
+    /* develblock:end */
     const start = expression.indexOf('#{');
     const end = expression.lastIndexOf('}');
+    /* develblock:start */
     if (start == -1 || end == -1 || end < start) {
         throw Error('argument must be encapsulated by "#{" and "}"');
     }
+    /* develblock:end */
     return new Expression(expression.substring(start + 2, end).split('.'));
 }
 
@@ -48,9 +51,11 @@ export function replaceValues(context, template) {
 
 export class Expression {
     constructor(pathElements) {
+        /* develblock:start */
         if (!Array.isArray(pathElements)) {
             throw new Error('parameter must be array');
         }
+        /* develblock:end */
         this.pathElements = pathElements;
     }
 
@@ -98,9 +103,11 @@ export class Expression {
         const base = this.getBase(context, index, lastIndex);
         const property = this.pathElements[lastIndex - 1];
         const propertyDescriptor = Object.getOwnPropertyDescriptor(base, property);
+        /* develblock:start */
         if (isUndefined(propertyDescriptor)) {
             throw new Error('property ' + property + ' not found');
         }
+        /* develblock:end */
         const oldSetter = propertyDescriptor.set;
         const expression = this;
         propertyDescriptor.valueHolder = {

@@ -7,5 +7,19 @@ module.exports = {
   },
   devServer: {
     contentBase: './dist'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        exclude: /(node_modules|\.spec\.js)/,
+        use: [
+          {
+            loader: 'webpack-strip-block'
+          }
+        ]
+      }
+    ]
   }
 };
