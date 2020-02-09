@@ -1,5 +1,5 @@
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/expression.js',
   output: {
     path: __dirname + '/dist',
     publicPath: '/',
