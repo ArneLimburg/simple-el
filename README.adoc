@@ -4,9 +4,7 @@ An implementation of a simple expression language for JavaScript.
 With this library it is possible to add more dynamic i.e. to web components.
 I.e. writing a dynamic table component is a matter of some lines:
 
-:sourcedir: examples/
-
 [source,js]
 ----
-include::{sourcedir}table.componet.js[]
+include::https://github.com/ArneLimburg/simple-el/blob/0cdfa465c23ae752be1c41494a5612e7581e8994/examples/table.component.js#L1-L27[]
 ---- 
