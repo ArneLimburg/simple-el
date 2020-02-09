@@ -73,22 +73,22 @@ export class Expression {
 
     setValue(context, value, index = 0, lastIndex = this.pathElements.length) {
         const base = this.getBase(context, index, lastIndex);
-        if (typeof base !== 'undefined') {
+        if (!isUndefined(base)) {
             base[this.pathElements[lastIndex - 1]] = value;
         }
     }
     
     getBase(context, index = 0, lastIndex = this.pathElements.length) {
         const object = this.getValue(context, index, lastIndex - 1);
-        if (typeof object === 'undefined') {
+        if (isUndefined(object)) {
             return undefined;
         }
         const pathElement = this.pathElements[lastIndex - 1];
         let parent = object;
-        while (typeof parent !== 'undefined' && parent !== null && !parent.hasOwnProperty(pathElement)) {
+        while (!isUndefined(parent) && parent !== null && !(pathElement in parent)) {
             parent = parent.parentNode;
         }
-        if (typeof parent === 'undefined' || parent === null) {
+        if (isUndefined(parent) || parent === null) {
             parent = object;
         }
         return parent;
@@ -98,7 +98,7 @@ export class Expression {
         const base = this.getBase(context, index, lastIndex);
         const property = this.pathElements[lastIndex - 1];
         const propertyDescriptor = Object.getOwnPropertyDescriptor(base, property);
-        if (typeof propertyDescriptor === 'undefined') {
+        if (isUndefined(propertyDescriptor)) {
             throw new Error('property ' + property + ' not found');
         }
         const oldSetter = propertyDescriptor.set;
@@ -112,13 +112,13 @@ export class Expression {
             propertyDescriptor.get = () => propertyDescriptor.valueHolder.value;
         }
         propertyDescriptor.set = function (value, v) {
-            if (typeof oldSetter !== 'undefined') {
+            if (!isUndefined(oldSetter)) {
                 oldSetter.call(value);
             } else {
                 propertyDescriptor.valueHolder.value = value;
             }
             callback.call();
-            if (typeof oldSetter !== 'undefined') {
+            if (!isUndefined(oldSetter)) {
                 propertyDescriptor.set = oldSetter;
             } else {
                 propertyDescriptor.value = propertyDescriptor.valueHolder.value;
@@ -131,4 +131,8 @@ export class Expression {
         };
         Object.defineProperty(base, property, propertyDescriptor);
     }
+}
+
+function isUndefined(object) {
+    return typeof object === 'undefined';
 }
